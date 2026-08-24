@@ -14,6 +14,7 @@
   "build": {
     "productName": "Platelet",
     "appId": "org.amor.platelet",
+    "publish": null,
     "dmg": {
       "contents": [
         {

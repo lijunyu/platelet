@@ -26,22 +26,13 @@ jobs:
         run: yarn install
 
       - name: Package (arm64)
-        run: yarn dist
+        run: yarn dist --publish never
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: platelet-mac-arm64
           path: |
-            build/*.dmg
-            build/*.zip
-            build/latest-mac.yml
-
-      - name: Publish release
-        if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
             build/*.dmg
             build/*.zip
             build/latest-mac.yml
@@ -64,7 +55,7 @@ jobs:
         run: yarn install
 
       - name: Package (Windows x64)
-        run: yarn dist --win
+        run: yarn dist --win --publish never
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -75,11 +66,30 @@ jobs:
             build/*.blockmap
             build/latest.yml
 
+  release:
+    needs: [build-mac-arm64, build-win-x64]
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download mac artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: platelet-mac-arm64
+          path: dist/mac
+
+      - name: Download win artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: platelet-win-x64
+          path: dist/win
+
       - name: Publish release
-        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v2
         with:
           files: |
-            build/*.exe
-            build/*.blockmap
-            build/latest.yml
+            dist/mac/*.dmg
+            dist/mac/*.zip
+            dist/mac/latest-mac.yml
+            dist/win/*.exe
+            dist/win/*.blockmap
+            dist/win/latest.yml
