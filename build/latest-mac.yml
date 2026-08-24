@@ -1,11 +1,11 @@
 version: 0.0.20
 files:
   - url: Platelet-0.0.20-arm64-mac.zip
-    sha512: DSBMLe8rjH4tg/LDuBnLDj1dlDPGGrWm/1MVt9ZtkYG3Rv4R75VeiOWUb7BglLXkgzKgLlXH7z3hwDHXrawxlA==
-    size: 101753339
+    sha512: FDdvcerWKRVyB6tVcXaHhMP6XCAB+691wHqEYHF0UzfpQ7RnwqJuttppnLmue9OQr031Iv/VpDtGzS8Xc0dvdQ==
+    size: 101753517
   - url: Platelet-0.0.20-arm64.dmg
-    sha512: GEL1FNli2D6aWI8C/uzmSb/jUO2mUsgoAni7vRo5D6LxFFbMsgR+c/yohPj5o8k1LIAQObQjDZVDeFvoxKbPvg==
-    size: 107020261
+    sha512: zw4rbW9LOGyh1xbdBQuazrmT+AdbZL9DISsqCN0Cj5URgT3RYMUO4/3ElBXoUgm06T5+EUciny/kle+w0PTYLA==
+    size: 107020416
 path: Platelet-0.0.20-arm64-mac.zip
-sha512: DSBMLe8rjH4tg/LDuBnLDj1dlDPGGrWm/1MVt9ZtkYG3Rv4R75VeiOWUb7BglLXkgzKgLlXH7z3hwDHXrawxlA==
-releaseDate: '2026-08-24T01:58:31.314Z'
+sha512: FDdvcerWKRVyB6tVcXaHhMP6XCAB+691wHqEYHF0UzfpQ7RnwqJuttppnLmue9OQr031Iv/VpDtGzS8Xc0dvdQ==
+releaseDate: '2026-08-24T02:16:49.439Z'

@@ -147,7 +147,8 @@ $.ajax({
 
 function showHitokoto() {
   $.getJSON(
-    "https://v1.hitokoto.cn/?encode=json",
+    // 加时间戳参数绕过 v1.hitokoto.cn 的缓存:同 URL 短时间多次请求会返回同一句
+    "https://v1.hitokoto.cn/?encode=json&_=" + Date.now(),
     function(result) {
       showMessage(result.hitokoto, 5000);
     }
