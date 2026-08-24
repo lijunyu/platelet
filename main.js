@@ -40,7 +40,7 @@ function createWindow() {
     webPreferences: {
       devTools: app.isPackaged ? false : true,
       nodeIntegration: true,
-      nodeIntegrationInWorker: true
+      sandbox: false
     }
   });
   mainWindow.on("closed", () => (mainWindow = null));
@@ -67,7 +67,7 @@ function createSettingWindow() {
     transparent: true,
     webPreferences: {
       nodeIntegration: true,
-      nodeIntegrationInWorker: true
+      sandbox: false
     },
     show: false
   });

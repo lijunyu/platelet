@@ -1,0 +1,47 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  build-mac-arm64:
+    runs-on: macos-14
+    env:
+      # 无开发者证书,跳过自动代码签名(未签名包需用户右键打开或手动绕过 Gatekeeper)
+      CSC_IDENTITY_AUTO_DISCOVERY: "false"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Package (arm64)
+        run: yarn dist
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: platelet-mac-arm64
+          path: |
+            build/*.dmg
+            build/*.zip
+            build/latest-mac.yml
+
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            build/*.dmg
+            build/*.zip
+            build/latest-mac.yml

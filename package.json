@@ -41,7 +41,21 @@
       "package.json"
     ],
     "mac": {
-      "icon": "build/icons/platelet.icns"
+      "icon": "build/icons/platelet.icns",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "arm64"
+          ]
+        }
+      ]
     },
     "win": {
       "icon": "build/icons/platelet.ico"
@@ -54,11 +68,14 @@
   "keywords": [
     "platelet"
   ],
-  "author": "amorist",
+  "author": {
+    "name": "amorist",
+    "email": "amorist@users.noreply.github.com"
+  },
   "license": "MIT",
   "devDependencies": {
-    "electron": "^10.1.3",
-    "electron-builder": "^22.4.1"
+    "electron": "^33.0.0",
+    "electron-builder": "^25.0.0"
   },
   "dependencies": {
     "dark-mode": "^4.0.0",

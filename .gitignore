@@ -55,10 +55,12 @@ typings/
 .yarn-integrity
 
 build/mac/*
+build/mac-*/
 build/*.app
 build/*.yaml
 build/*.zip
 build/*.dmg
 build/*.blockmap
+build/builder-debug.yml
 
 .DS_Store
