@@ -62,5 +62,9 @@ build/*.zip
 build/*.dmg
 build/*.blockmap
 build/builder-debug.yml
+build/*.exe
+build/*.exe.blockmap
+build/win-unpacked/
+build/latest.yml
 
 .DS_Store
