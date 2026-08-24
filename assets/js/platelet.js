@@ -225,12 +225,10 @@ function playVoice(file, is_play) {
   }
 }
 
-// toggle app dark mode.
-// dark-mode@4 是纯 ESM,无法 require;改用 Electron 内置 nativeTheme。
+// toggle dark mode (护眼).
+// 通过主进程 osascript 切换 macOS 系统深色模式,与旧版 dark-mode 包行为一致。
 function switchNightMode() {
-  const { nativeTheme } = require("electron");
-  nativeTheme.themeSource =
-    nativeTheme.themeSource === "dark" ? "light" : "dark";
+  ipcRenderer.send("toggle-dark-mode");
 }
 
 // show setting window.

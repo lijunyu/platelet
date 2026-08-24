@@ -1,6 +1,7 @@
 const path = require("path");
 const { app, BrowserWindow, TouchBar, ipcMain, screen } = require("electron");
 const { TouchBarButton } = TouchBar;
+const { exec } = require("child_process");
 const Store = require("electron-store");
 
 // 渲染进程的 store.js 通过 ipcRenderer.sendSync 与主进程通信,必须先注册处理器
@@ -128,4 +129,21 @@ ipcMain.on("platelet-move", (event, dx, dy) => {
   if (!mainWindow) return;
   const [x, y] = mainWindow.getPosition();
   mainWindow.setPosition(x + dx, y + dy);
+});
+
+// 护眼:切换 macOS 系统深色模式(原 dark-mode 包内部即 osascript)
+// 注意:首次切换会请求"辅助功能"权限(System Events 控制外观)
+ipcMain.on("toggle-dark-mode", () => {
+  exec(
+    'osascript -e \'tell application "System Events" to tell appearance preferences to get dark mode\'',
+    (err, stdout) => {
+      const isDark = String(stdout).trim() === "true";
+      const next = isDark ? "false" : "true";
+      exec(
+        'osascript -e \'tell application "System Events" to tell appearance preferences to set dark mode to ' +
+          next +
+          "'"
+      );
+    }
+  );
 });
