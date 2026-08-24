@@ -2,7 +2,6 @@ body {
   background: transparent;
 }
 .platelet {
-  -webkit-app-region: drag;
   position: fixed;
   bottom: 0;
   left: 10;
@@ -200,6 +199,7 @@ body {
   right: 10px;
   font-size: 14px;
   position: absolute;
+  -webkit-app-region: no-drag;
 }
 .platelet:hover .platelet-tool {
   display: block;

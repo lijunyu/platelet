@@ -1,6 +1,10 @@
 const path = require("path");
 const { app, BrowserWindow, TouchBar, ipcMain, screen } = require("electron");
 const { TouchBarButton } = TouchBar;
+const Store = require("electron-store");
+
+// 渲染进程的 store.js 通过 ipcRenderer.sendSync 与主进程通信,必须先注册处理器
+Store.initRenderer();
 
 const MAIN_WIDTH = 320;
 const MAIN_HEIGHT = 350;
@@ -40,6 +44,7 @@ function createWindow() {
     webPreferences: {
       devTools: app.isPackaged ? false : true,
       nodeIntegration: true,
+      contextIsolation: false,
       sandbox: false
     }
   });
@@ -67,6 +72,7 @@ function createSettingWindow() {
     transparent: true,
     webPreferences: {
       nodeIntegration: true,
+      contextIsolation: false,
       sandbox: false
     },
     show: false
@@ -115,4 +121,11 @@ ipcMain.on("hide-setting-window", event => {
 
 ipcMain.on("setting-hitokoto", (event, data) => {
   mainWindow.webContents.send("setting-hitokoto", data);
+});
+
+// 渲染进程 JS 拖拽:去掉 -webkit-app-region: drag 后,由渲染进程上报位移来移动窗口
+ipcMain.on("platelet-move", (event, dx, dy) => {
+  if (!mainWindow) return;
+  const [x, y] = mainWindow.getPosition();
+  mainWindow.setPosition(x + dx, y + dy);
 });

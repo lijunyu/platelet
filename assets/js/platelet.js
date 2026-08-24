@@ -1,5 +1,4 @@
 const { ipcRenderer } = require("electron");
-const darkMode = require("dark-mode");
 
 String.prototype.render = function(context) {
   var tokenReg = /(\\)?\{([^\{\}\\]+)(\\)?\}/g;
@@ -148,7 +147,7 @@ $.ajax({
 
 function showHitokoto() {
   $.getJSON(
-    "https://api.imjad.cn/hitokoto/?cat=&charset=utf-8&length=55&encode=json",
+    "https://v1.hitokoto.cn/?encode=json",
     function(result) {
       showMessage(result.hitokoto, 5000);
     }
@@ -226,9 +225,12 @@ function playVoice(file, is_play) {
   }
 }
 
-// toggle dark mode.
+// toggle app dark mode.
+// dark-mode@4 是纯 ESM,无法 require;改用 Electron 内置 nativeTheme。
 function switchNightMode() {
-  darkMode.toggle().then(() => {});
+  const { nativeTheme } = require("electron");
+  nativeTheme.themeSource =
+    nativeTheme.themeSource === "dark" ? "light" : "dark";
 }
 
 // show setting window.
@@ -247,3 +249,25 @@ ipcRenderer.on('setting-hitokoto', (event, data) => {
     showMessage("主人，太棒了！", 3000, true);
     window.hitokotoTimer = setInterval(showHitokoto, store.get('hitokoto'));
 })
+
+// 窗口拖拽:Electron 新版本中 -webkit-app-region: drag 区域会吞掉鼠标事件,
+// 导致 :hover 和按钮点击失效,这里改用 JS 拖拽(区分"点击"与"拖动")。
+let dragging = null;
+$(".platelet").on("mousedown", function(e) {
+  dragging = { x: e.screenX, y: e.screenY, moved: false };
+});
+$(document).on("mousemove", function(e) {
+  if (!dragging) return;
+  const dx = e.screenX - dragging.x;
+  const dy = e.screenY - dragging.y;
+  if (dx === 0 && dy === 0) return;
+  dragging.x = e.screenX;
+  dragging.y = e.screenY;
+  // 忽略微小抖动,避免误判为拖拽
+  if (!dragging.moved && Math.abs(dx) + Math.abs(dy) < 6) return;
+  dragging.moved = true;
+  ipcRenderer.send("platelet-move", dx, dy);
+});
+$(document).on("mouseup", function() {
+  dragging = null;
+});
