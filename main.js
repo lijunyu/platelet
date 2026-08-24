@@ -1,6 +1,5 @@
 const path = require("path");
-const { app, BrowserWindow, TouchBar, ipcMain, screen } = require("electron");
-const { TouchBarButton } = TouchBar;
+const { app, BrowserWindow, TouchBar, ipcMain, screen, nativeTheme } = require("electron");
 const { exec } = require("child_process");
 const Store = require("electron-store");
 
@@ -10,19 +9,21 @@ Store.initRenderer();
 const MAIN_WIDTH = 320;
 const MAIN_HEIGHT = 350;
 
-const spin = new TouchBarButton({
-  label: "👻 血小板 けっしょうばん",
-  backgroundColor: "#7851A9",
-  click: () => {
-    console.log("血小板");
-  }
-});
-
-let spins = [spin];
-
-const touchBar = new TouchBar({
-  items: spins
-});
+// TouchBar 仅 macOS 可用,Windows/Linux 上为 undefined,必须做平台保护
+let touchBar = null;
+if (process.platform === "darwin" && TouchBar) {
+  const { TouchBarButton } = TouchBar;
+  const spin = new TouchBarButton({
+    label: "👻 血小板 けっしょうばん",
+    backgroundColor: "#7851A9",
+    click: () => {
+      console.log("血小板");
+    }
+  });
+  touchBar = new TouchBar({
+    items: [spin]
+  });
+}
 
 let mainWindow, settingWindow;
 
@@ -53,7 +54,7 @@ function createWindow() {
   mainWindow.loadFile(path.join(__dirname, "index.html"));
   mainWindow.once("ready-to-show", () => {
     mainWindow.show();
-    mainWindow.setTouchBar(touchBar);
+    if (touchBar) mainWindow.setTouchBar(touchBar);
   });
 }
 
@@ -131,19 +132,41 @@ ipcMain.on("platelet-move", (event, dx, dy) => {
   mainWindow.setPosition(x + dx, y + dy);
 });
 
-// 护眼:切换 macOS 系统深色模式(原 dark-mode 包内部即 osascript)
-// 注意:首次切换会请求"辅助功能"权限(System Events 控制外观)
+// 护眼:切换系统深色模式
+// macOS:osascript 切系统外观(原 dark-mode 包行为,首次会请求"辅助功能"权限)
+// Windows:写注册表 AppsUseLightTheme 切换系统深色,实时生效
+// 其他平台:应用内 nativeTheme
 ipcMain.on("toggle-dark-mode", () => {
-  exec(
-    'osascript -e \'tell application "System Events" to tell appearance preferences to get dark mode\'',
-    (err, stdout) => {
-      const isDark = String(stdout).trim() === "true";
-      const next = isDark ? "false" : "true";
-      exec(
-        'osascript -e \'tell application "System Events" to tell appearance preferences to set dark mode to ' +
-          next +
-          "'"
-      );
-    }
-  );
+  if (process.platform === "darwin") {
+    exec(
+      'osascript -e \'tell application "System Events" to tell appearance preferences to get dark mode\'',
+      (err, stdout) => {
+        if (err) return;
+        const isDark = String(stdout).trim() === "true";
+        const next = isDark ? "false" : "true";
+        exec(
+          'osascript -e \'tell application "System Events" to tell appearance preferences to set dark mode to ' +
+            next +
+            "'"
+        );
+      }
+    );
+  } else if (process.platform === "win32") {
+    const regPath =
+      "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize";
+    exec(
+      `powershell -NoProfile -Command "(Get-ItemProperty -Path '${regPath}').AppsUseLightTheme"`,
+      (err, stdout) => {
+        if (err) return;
+        const isLight = String(stdout).trim() === "1";
+        const next = isLight ? "0" : "1";
+        exec(
+          `powershell -NoProfile -Command "Set-ItemProperty -Path '${regPath}' -Name AppsUseLightTheme -Value ${next}"`
+        );
+      }
+    );
+  } else {
+    nativeTheme.themeSource =
+      nativeTheme.themeSource === "dark" ? "light" : "dark";
+  }
 });

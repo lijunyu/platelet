@@ -45,3 +45,41 @@ jobs:
             build/*.dmg
             build/*.zip
             build/latest-mac.yml
+
+  build-win-x64:
+    runs-on: windows-latest
+    env:
+      CSC_IDENTITY_AUTO_DISCOVERY: "false"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Package (Windows x64)
+        run: yarn dist --win
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: platelet-win-x64
+          path: |
+            build/*.exe
+            build/*.blockmap
+            build/latest.yml
+
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            build/*.exe
+            build/*.blockmap
+            build/latest.yml

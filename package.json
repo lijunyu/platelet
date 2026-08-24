@@ -58,7 +58,15 @@
       ]
     },
     "win": {
-      "icon": "build/icons/platelet.ico"
+      "icon": "build/icons/platelet.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
     },
     "linux": {
       "icon": "build/icons"
